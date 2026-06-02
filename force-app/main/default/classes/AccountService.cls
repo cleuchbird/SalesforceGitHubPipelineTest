@@ -19,7 +19,7 @@ public class AccountService {
             Account a = new Account(Name = name + '-' + i);
             insert a;
             // SF-0025 / SF-SYS-DEBUG: System.debug can expose data and impacts limits
-            System.debug('Created account ' + a.Id + ' owner ' + defaultOwnerId);
+            System.debug('Created account ' + a.Id + ' owner ' + defaultOwnerId + ' (scan trigger)');
         }
 
         // SF-0003: 'if' statement without braces
