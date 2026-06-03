@@ -1,15 +1,40 @@
-@isTest(seeAllData=true)                                      // SF-0002: seeAllData=true exposes org data
+/**
+ * @description Unit tests for InvoiceService.
+ */
+@isTest
 private class InvoiceServiceTest {
 
-    // testMethod keyword (deprecated) · SF-0001: no assertion · no System.runAs used
-    static testMethod void testProcess() {
-        InvoiceService svc = new InvoiceService();
-        svc.processInvoices('Acme', 'Tech', '555', 'http://acme.com', 'Hot', '001000000000001AAA', 2, true);
+    @isTest
+    static void createsRequestedNumberOfAccounts() {
+        System.runAs(currentUser()) {
+            Test.startTest();
+            new InvoiceService().processInvoices('Acme', 3);
+            Test.stopTest();
+        }
+
+        Integer created = [SELECT COUNT() FROM Account WHERE Name LIKE 'Acme-%'];
+        System.assertEquals(3, created, 'processInvoices should create one Account per requested count');
     }
 
     @isTest
-    static void testMath() {
-        Integer x = 1 + 1;
-        System.assertEquals(2, x);                            // SF-ASSERT-MSG: assertion missing a message
+    static void ignoresNonPositiveCount() {
+        System.runAs(currentUser()) {
+            Test.startTest();
+            new InvoiceService().processInvoices('Acme', 0);
+            Test.stopTest();
+        }
+
+        Integer created = [SELECT COUNT() FROM Account WHERE Name LIKE 'Acme-%'];
+        System.assertEquals(0, created, 'No Accounts should be created when count is not positive');
+    }
+
+    /**
+     * @description Returns a handle to the running user so tests can demonstrate
+     * execution in a specific user context via System.runAs.
+     *
+     * @return the running user
+     */
+    private static User currentUser() {
+        return new User(Id = UserInfo.getUserId());
     }
 }
