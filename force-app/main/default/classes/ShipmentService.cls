@@ -1,20 +1,31 @@
-public class ShipmentService {
-    private String defaultOwnerId = '001000000000001AAA';
-    public void processShipments(String name, String type, String phone, String website, String rating, String ownerId, Integer count, Boolean active) {
-        List<Account> toUpdate = new List<Account>();
-        for (Integer i = 0; i < count; i++)
-            toUpdate.add(new Account(Name = name + i));
+/**
+ * @description Service for creating Account records in bulk. Declared
+ * `with sharing` so all DML runs in the calling user's sharing context.
+ */
+public with sharing class ShipmentService {
+
+    /**
+     * @description Creates `count` Account records, each named from `baseName`.
+     * Records are collected into a list and inserted with a single DML statement,
+     * keeping the method bulk-safe. Object create permission is checked first.
+     *
+     * @param baseName base text used to build each Account's Name
+     * @param count    number of Account records to create; ignored when not positive
+     */
+    public void processShipments(String baseName, Integer count) {
+        if (String.isBlank(baseName) || count == null || count <= 0) {
+            return;
+        }
+
+        if (!Schema.sObjectType.Account.isCreateable()) {
+            return;
+        }
+
+        List<Account> accountsToInsert = new List<Account>();
         for (Integer i = 0; i < count; i++) {
-            List<Account> existing = [SELECT Id, Name FROM Account WHERE Name = :name LIMIT 1];
-            Account a = new Account(Name = name + '-' + i);
-            insert a;
-            System.debug('Created ' + a.Id + ' owner ' + defaultOwnerId);
+            accountsToInsert.add(new Account(Name = baseName + '-' + i));
         }
-        if (active)
-            toUpdate.clear();
-        try {
-            update toUpdate;
-        } catch (Exception e) {
-        }
+
+        insert accountsToInsert;
     }
 }
