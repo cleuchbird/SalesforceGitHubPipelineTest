@@ -35,10 +35,15 @@ They run a three-act cycle: **introduce violations → gate blocks → resolve �
 | `/qc-demo-pr` | 2 — gate | Opens the PR into `develop`; the scan posts 🔴 blocker comments and **fails** the PR. |
 | `/qc-demo-resolve` | 3 — resolve | Rewrites the Apex into compliant code (and moves trigger logic to a handler), pushes; the gate flips to ✅ **Passed, 0 issues**. |
 | `/qc-demo [theme]` | all | Runs all three acts hands-off and reports the block → green transition. |
+| `/qc-demo-cleanup [branch \| --all]` | teardown | Closes the demo PR **without merging** and deletes the demo branch (local + remote), returning the repo to a clean `develop`. Pass `--all` to sweep every leftover demo branch. |
 
 `theme` is an optional business noun (e.g. `Order`, `Invoice`) used to name the elements; it defaults
 to a fresh one. Branch and element names are timestamped so repeated runs never collide. A clean run
 shows **27 blockers → 0**.
+
+The three acts and the one-shot deliberately **leave the green PR open** as the "after" exhibit. Run
+`/qc-demo-cleanup` when you are finished showing it — it closes the PR unmerged (so `develop` stays
+Apex-free, per the invariant below) and removes the branch.
 
 ## ⚠️ The clean-baseline invariant
 
