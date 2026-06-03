@@ -15,8 +15,13 @@ Optional branch argument: `$ARGUMENTS`
 
 - Base branch is **`develop`**; the QC workflow triggers on `pull_request`. Pushing to the demo
   branch re-runs the scan on its open PR (a `synchronize` event).
-- The compliant templates below are **verified green** (0 blockers) for the service + test. The
-  trigger is made compliant by delegating to a handler class. Salesforce API version is **64.0**.
+- The compliant templates below are **verified green** (0 blockers) — service, test, trigger, and
+  handler all scan clean. Salesforce API version is **64.0**.
+- **The QC action scans the whole branch's Apex** (it diffs against `main`, which has no Apex), not
+  just the PR's changed files. The gate can therefore only reach green if **every** Apex file on the
+  branch is compliant. This requires `develop`'s Apex baseline to stay clean — if the scan reports
+  blockers in elements you did **not** create this run, they are coming from develop's baseline, which
+  must be cleaned first. (develop is intentionally kept free of Apex for this reason.)
 - Do **not** hardcode the GitHub repo URL/name. Let `gh` derive it from the remote; use `{owner}/{repo}`.
 
 ## Steps

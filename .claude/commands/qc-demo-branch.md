@@ -18,8 +18,10 @@ used by an existing branch or file.
 
 - The QC workflow lives at `.github/workflows/main.yml` on **`develop`** and triggers on `pull_request`.
   Pushing a branch alone does **not** scan — only opening a PR does. (This is what makes the two-step split work.)
-- `develop` already contains the SFDX scaffold and the workflow. Branch off `develop` so the eventual
-  PR diff shows **only the new violating elements**.
+- `develop` contains the SFDX scaffold and the workflow but **no Apex baseline** (kept intentionally
+  clean). Branch off `develop`. Note: the QC action scans the **whole branch's Apex** (it diffs against
+  `main`), so the scan reflects every Apex file on the branch — a clean develop baseline keeps the scan
+  focused on your new elements and lets the later `/qc-demo-resolve` step reach a clean green gate.
 - Salesforce API version is **64.0**. Classes go in `force-app/main/default/classes/`, triggers in
   `force-app/main/default/triggers/`. Every `.cls`/`.trigger` needs a matching `-meta.xml`.
 - Do **not** hardcode the GitHub repo URL/name (it has been renamed before).
