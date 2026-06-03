@@ -1,5 +1,5 @@
 /**
- * Unit tests for AccountService.
+ * @description Unit tests for AccountService.
  */
 @isTest
 private class AccountServiceTest {
@@ -29,8 +29,10 @@ private class AccountServiceTest {
     }
 
     /**
-     * Returns a handle to the running user so tests can demonstrate execution
-     * in a specific user context via System.runAs.
+     * @description Returns a handle to the running user so tests can demonstrate
+     * execution in a specific user context via System.runAs.
+     *
+     * @return the running user
      */
     private static User currentUser() {
         return new User(Id = UserInfo.getUserId());
