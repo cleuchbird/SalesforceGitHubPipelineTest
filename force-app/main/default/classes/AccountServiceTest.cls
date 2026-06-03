@@ -1,19 +1,38 @@
-// SF-0002: @isTest(seeAllData=true) exposes org data to the test
-@isTest(seeAllData=true)
+/**
+ * Unit tests for AccountService.
+ */
+@isTest
 private class AccountServiceTest {
 
-    // SF-IS-TEST: deprecated 'testMethod' keyword (should use @isTest)
-    // SF-0001: unit test contains no assertion
-    // SF-APEX-RUNAS: no System.runAs used anywhere in the test class
-    static testMethod void testProcessAccounts() {
-        AccountService svc = new AccountService();
-        svc.processAccounts('Acme', 'Tech', '555', 'http://acme.com', 'Hot', '001000000000001AAA', 2, true);
+    @isTest
+    static void createsRequestedNumberOfAccounts() {
+        System.runAs(currentUser()) {
+            Test.startTest();
+            new AccountService().processAccounts('Acme', 3);
+            Test.stopTest();
+        }
+
+        Integer created = [SELECT COUNT() FROM Account WHERE Name LIKE 'Acme-%'];
+        System.assertEquals(3, created, 'processAccounts should create one Account per requested count');
     }
 
     @isTest
-    static void testAssertNoMessage() {
-        Integer x = 1 + 1;
-        // SF-ASSERT-MSG: assertion is missing an explanatory message
-        System.assertEquals(2, x);
+    static void ignoresNonPositiveCount() {
+        System.runAs(currentUser()) {
+            Test.startTest();
+            new AccountService().processAccounts('Acme', 0);
+            Test.stopTest();
+        }
+
+        Integer created = [SELECT COUNT() FROM Account WHERE Name LIKE 'Acme-%'];
+        System.assertEquals(0, created, 'No Accounts should be created when count is not positive');
+    }
+
+    /**
+     * Returns a handle to the running user so tests can demonstrate execution
+     * in a specific user context via System.runAs.
+     */
+    private static User currentUser() {
+        return new User(Id = UserInfo.getUserId());
     }
 }
